@@ -266,42 +266,37 @@
             img.src = backgroundImage;
             
             img.onload = function() {
-                // 计算裁剪区域：裁剪图片中心区域
+                // 计算图片和canvas的宽高比
                 const imgWidth = img.width;
                 const imgHeight = img.height;
-                
-                // 裁剪掉图片底部的1/10
-                const keptHeight = imgHeight * 0.9;
-                
-                // 计算图片和canvas的宽高比
-                const imgRatio = imgWidth / keptHeight;
+                const imgRatio = imgWidth / imgHeight;
                 const canvasRatio = canvas.width / canvas.height;
                 
-                let cropWidth, cropHeight, cropX, cropY;
+                let drawWidth, drawHeight, offsetX, offsetY;
                 
                 if (imgRatio > canvasRatio) {
-                    // 图片比canvas更宽，裁剪中心高度
-                    cropHeight = keptHeight;
-                    cropWidth = cropHeight * canvasRatio;
-                    cropX = (imgWidth - cropWidth) / 2;
-                    cropY = 0; // 从顶部开始裁剪
+                    // 图片比canvas更宽，按高度缩放
+                    drawHeight = canvas.height;
+                    drawWidth = drawHeight * imgRatio;
+                    offsetX = (canvas.width - drawWidth) / 2;
+                    offsetY = 0;
                 } else {
-                    // 图片比canvas更高，裁剪中心宽度
-                    cropWidth = imgWidth;
-                    cropHeight = keptHeight;
-                    cropX = 0;
-                    cropY = 0; // 从顶部开始裁剪，裁剪掉底部1/10
+                    // 图片比canvas更高，按宽度缩放
+                    drawWidth = canvas.width;
+                    drawHeight = drawWidth / imgRatio;
+                    offsetX = 0;
+                    offsetY = (canvas.height - drawHeight) / 2;
                 }
                 
                 // 设置图片绘制质量
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
                 
-                // 绘制裁剪后的背景图片，填满整个canvas
+                // 绘制完整的背景图片，保持比例填满整个canvas
                 ctx.drawImage(
                     img, 
-                    cropX, cropY, cropWidth, cropHeight, // 源图像中心裁剪区域
-                    0, 0, canvas.width, canvas.height // 目标画布填满整个区域
+                    0, 0, imgWidth, imgHeight, // 完整的源图像
+                    offsetX, offsetY, drawWidth, drawHeight // 目标画布，保持比例
                 );
                 
                 // 设置文字样式
@@ -388,22 +383,19 @@
             img.src = backgroundImage;
             
             img.onload = function() {
-                // 设置canvas为图片的真实大小（保持比例）
+                // 设置canvas为图片的真实大小
                 const imgWidth = img.width;
                 const imgHeight = img.height;
                 
-                // 裁剪掉图片底部的1/10
-                const keptHeight = imgHeight * 0.9;
-                
-                // 设置临时canvas尺寸为裁剪后的真实大小
+                // 设置临时canvas尺寸为图片的真实大小
                 tempCanvas.width = imgWidth;
-                tempCanvas.height = keptHeight;
+                tempCanvas.height = imgHeight;
                 
-                // 绘制背景图片（不压缩）
+                // 绘制完整的背景图片（不裁剪）
                 tempCtx.drawImage(
                     img, 
-                    0, 0, imgWidth, keptHeight, // 源图像裁剪区域
-                    0, 0, imgWidth, keptHeight // 目标画布真实大小
+                    0, 0, imgWidth, imgHeight, // 完整的源图像
+                    0, 0, imgWidth, imgHeight // 目标画布真实大小
                 );
                 
                 // 设置文字样式（根据真实大小调整字体大小）
