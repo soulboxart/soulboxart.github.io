@@ -490,9 +490,10 @@ drawBtn.addEventListener('click', () => {
         forwardBtn.style.cursor = 'pointer';
         
         forwardBtn.addEventListener('click', () => {
-            // 跳转到结果页面，通过URL参数传递卦象信息
-            const url = `result.html?name=${encodeURIComponent(randomGua.name)}&explanation=${encodeURIComponent(randomGua.explanation)}&sentence=${encodeURIComponent(randomGua.sentence)}&result=${encodeURIComponent(randomGua.result)}&adviceAI=${encodeURIComponent(randomGua.adviceAI)}`;
-            window.location.href = url;
+            // 使用localStorage存储卦象数据，减少URL参数大小
+            localStorage.setItem('currentHexagram', JSON.stringify(randomGua));
+            // 跳转到结果页面，只传递必要的参数
+            window.location.href = 'result.html';
         });
         
         modalContent.appendChild(sentenceElement);
