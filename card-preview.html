@@ -218,7 +218,7 @@
         }
     </style>
 </head>
-<body>
+<body class="page-transition">
     <div id="snow-container"></div>
     <div class="preview-container">
         <h1>心灵卡预览</h1>
@@ -228,8 +228,8 @@
         <div class="button-container">
             <button class="save-btn" onclick="saveFortuneCard()">保存心灵卡</button>
             <div class="back-buttons-container">
-                <button class="save-btn back-button" onclick="location.href='result.html'">返回结果页</button>
-                <button class="save-btn back-button" onclick="location.href='index.html'">返回首页</button>
+                <button class="save-btn back-button" onclick="navigateTo('result.html')">返回结果页</button>
+                <button class="save-btn back-button" onclick="navigateTo('index.html')">返回首页</button>
             </div>
             <p class="hint-text">分享给好友，比拼马年运势～</p>
         </div>
@@ -237,8 +237,22 @@
     <div id="petals-container"></div>
     
     <script>
+        // 页面跳转函数
+        function navigateTo(url) {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(-20px)';
+            setTimeout(function() {
+                window.location.href = url;
+            }, 200);
+        }
+
         // 创建雪花
         window.onload = function() {
+            // 移除页面加载动画类
+            setTimeout(function() {
+                document.body.classList.remove('page-transition');
+            }, 100);
+            
             // 创建雪花
             const snowContainer = document.getElementById('snow-container');
             if (snowContainer) {
@@ -270,7 +284,7 @@
             const hexagramData = localStorage.getItem('currentHexagram');
             if (!hexagramData) {
                 alert('无法获取心灵卡内容，请重新抽签');
-                location.href = 'result.html';
+                navigateTo('result.html');
                 return;
             }
             
@@ -279,7 +293,7 @@
             
             if (!sentence) {
                 alert('无法获取心灵卡内容，请重新抽签');
-                location.href = 'result.html';
+                navigateTo('result.html');
                 return;
             }
             
