@@ -562,10 +562,14 @@
                         const link = document.createElement('a');
                         link.download = '马年心灵卡.jpg';
                         link.href = URL.createObjectURL(blob);
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
                         link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
                         
                         // 提示用户保存并转发
-                        alert('心灵卡已保存，请分享给好友，传递马年好运！');
+                        alert('心灵卡已保存到默认下载文件夹，请分享给好友，传递马年好运！');
                     }, 'image/jpeg', 0.9);
                 };
                 
@@ -577,10 +581,14 @@
                         const link = document.createElement('a');
                         link.download = '马年心灵卡.jpg';
                         link.href = URL.createObjectURL(blob);
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
                         link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(link.href);
                         
                         // 提示用户保存并转发
-                        alert('心灵卡已保存（二维码加载失败），请分享给好友，传递马年好运！');
+                        alert('心灵卡已保存到默认下载文件夹（二维码加载失败），请分享给好友，传递马年好运！');
                     }, 'image/jpeg', 0.9);
                 };
             };
