@@ -232,9 +232,16 @@
 
         // 生成马年专属心灵卡
         function generateFortuneCard() {
-            // 直接从URL参数中获取数据
-            const sentence = getQueryParam('sentence');
-            const result = getQueryParam('result');
+            // 从localStorage中获取卦象数据
+            const hexagramData = localStorage.getItem('currentHexagram');
+            if (!hexagramData) {
+                alert('无法获取心灵卡内容，请重新抽签');
+                return;
+            }
+            
+            const randomGua = JSON.parse(hexagramData);
+            const sentence = randomGua.sentence;
+            const result = randomGua.result;
             
             if (!sentence) {
                 alert('无法获取心灵卡内容，请重新抽签');
@@ -351,7 +358,7 @@
                     ctx.fillText(line, 20, startY + index * lineHeight);
                 });
                 
-                // 显示预览容器
+                // 先显示预览容器和隐藏其他元素
                 document.getElementById('card-preview').style.display = 'block';
                 // 隐藏生成心灵卡按钮
                 document.getElementById('generate-card-btn').style.display = 'none';
@@ -361,6 +368,25 @@
                 document.getElementById('hexagram-result').style.display = 'none';
                 document.getElementById('hexagram-explanation').style.display = 'none';
                 document.getElementById('hexagram-advice').style.display = 'none';
+                
+                // 加载并绘制二维码图片到右下角
+                const qrCodeImg = new Image();
+                qrCodeImg.crossOrigin = 'Anonymous'; // 允许跨域加载
+                qrCodeImg.src = 'qrcode.png';
+                
+                qrCodeImg.onload = function() {
+                    // 设置二维码大小和位置（右下角）
+                    const qrCodeSize = 40; // 二维码大小（调小）
+                    const qrCodeX = canvas.width - qrCodeSize - 10; // 右边距10px
+                    const qrCodeY = canvas.height - qrCodeSize - 10; // 下边距10px
+                    
+                    // 绘制二维码
+                    ctx.drawImage(qrCodeImg, qrCodeX, qrCodeY, qrCodeSize, qrCodeSize);
+                };
+                
+                qrCodeImg.onerror = function() {
+                    console.error('无法加载二维码图片');
+                };
             };
             
             img.onerror = function() {
@@ -454,17 +480,47 @@
                     tempCtx.fillText(line, 20 * scaleFactor, startY + index * lineHeight);
                 });
                 
-                // 将临时canvas转换为图片
-                tempCanvas.toBlob(function(blob) {
-                    // 创建下载链接
-                    const link = document.createElement('a');
-                    link.download = '马年心灵卡.png';
-                    link.href = URL.createObjectURL(blob);
-                    link.click();
+                // 加载并绘制二维码图片到右下角
+                const qrCodeImg = new Image();
+                qrCodeImg.crossOrigin = 'Anonymous'; // 允许跨域加载
+                qrCodeImg.src = 'qrcode.png';
+                
+                qrCodeImg.onload = function() {
+                    // 设置二维码大小和位置（右下角）
+                    const qrCodeSize = 60 * scaleFactor; // 二维码大小（调小），根据缩放因子调整
+                    const qrCodeX = tempCanvas.width - qrCodeSize - 10 * scaleFactor; // 右边距10px，根据缩放因子调整
+                    const qrCodeY = tempCanvas.height - qrCodeSize - 10 * scaleFactor; // 下边距10px，根据缩放因子调整
                     
-                    // 提示用户保存并转发
-                    alert('心灵卡已保存，请分享给好友，传递马年好运！');
-                });
+                    // 绘制二维码
+                    tempCtx.drawImage(qrCodeImg, qrCodeX, qrCodeY, qrCodeSize, qrCodeSize);
+                    
+                    // 将临时canvas转换为图片
+                    tempCanvas.toBlob(function(blob) {
+                        // 创建下载链接
+                        const link = document.createElement('a');
+                        link.download = '马年心灵卡.png';
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        
+                        // 提示用户保存并转发
+                        alert('心灵卡已保存，请分享给好友，传递马年好运！');
+                    });
+                };
+                
+                qrCodeImg.onerror = function() {
+                    console.error('无法加载二维码图片');
+                    // 即使二维码加载失败，也保存图片
+                    tempCanvas.toBlob(function(blob) {
+                        // 创建下载链接
+                        const link = document.createElement('a');
+                        link.download = '马年心灵卡.png';
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        
+                        // 提示用户保存并转发
+                        alert('心灵卡已保存（二维码加载失败），请分享给好友，传递马年好运！');
+                    });
+                };
             };
             
             img.onerror = function() {
@@ -496,27 +552,19 @@
                 }
             }
             
-            // 显示抽签结果
-            const name = getQueryParam('name');
-            const explanation = getQueryParam('explanation');
-            
-            // 查找对应的卦象数据，获取result和adviceAI
-            let result = "";
-            let adviceAI = "";
-            for (const hexagram of hexagrams) {
-                if (hexagram.name === name) {
-                    result = hexagram.result;
-                    adviceAI = hexagram.adviceAI;
-                    break;
-                }
-            }
-            
-            if (name && explanation) {
-                document.getElementById('hexagram-name').textContent = name;
-                document.getElementById('hexagram-result').textContent = `${result}`;
-                document.getElementById('hexagram-explanation').textContent = explanation;
-                if (adviceAI) {
-                    document.getElementById('hexagram-advice').textContent = `建议：${adviceAI}`;
+            // 从localStorage中获取卦象数据
+            const hexagramData = localStorage.getItem('currentHexagram');
+            if (hexagramData) {
+                const randomGua = JSON.parse(hexagramData);
+                const { name, explanation, result, adviceAI } = randomGua;
+                
+                if (name && explanation) {
+                    document.getElementById('hexagram-name').textContent = name;
+                    document.getElementById('hexagram-result').textContent = `${result}`;
+                    document.getElementById('hexagram-explanation').textContent = explanation;
+                    if (adviceAI) {
+                        document.getElementById('hexagram-advice').textContent = `建议：${adviceAI}`;
+                    }
                 }
             }
         };
