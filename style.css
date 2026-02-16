@@ -12,6 +12,22 @@ body {
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 页面切换动画类 */
+.page-transition {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* 按钮点击动画 */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.95);
 }
 
 .page {
