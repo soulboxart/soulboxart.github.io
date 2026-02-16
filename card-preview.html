@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>心灵卡预览</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #b0221b;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+        }
+        
+        /* 雪花容器 */
+        #snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+            display: block;
+            overflow: hidden;
+        }
+        
+        /* 雪花动画 */
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 玻璃拟态预览容器 */
+        .preview-container {
+            width: 90%;
+            max-width: 500px;
+            /* 玻璃拟态效果 */
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(245, 196, 226, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(177, 190, 242, 0.2);
+            padding: 30px;
+            text-align: center;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 32px;
+            color: #FEF2DC;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(176, 34, 27, 0.3);
+            font-weight: bold;
+        }
+
+        /* 心灵卡画布容器 */
+        .card-canvas-container {
+            width: 100%;
+            max-width: 230px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        /* 心灵卡画布 */
+        #fortune-card {
+            border: 2px solid #FEF2DC;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 230px;
+            height: auto;
+            aspect-ratio: 1280/2275;
+            image-rendering: optimizeQuality;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
+        }
+
+        /* 按钮容器 */
+        .button-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 返回按钮容器 */
+        .back-buttons-container {
+            width: 80%;
+            max-width: 300px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* 返回按钮样式 */
+        .back-button {
+            flex: 1;
+            min-width: calc(50% - 5px);
+            max-width: calc(50% - 5px);
+        }
+
+        /* 保存按钮样式 */
+        .save-btn {
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #b0221b;
+            background: #FEF2DC;
+            border: 1px solid #FEF2DC;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(254, 242, 220, 0.3), 0 2px 4px rgba(254, 242, 220, 0.2);
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .save-btn:hover {
+            box-shadow: 0 8px 16px rgba(254, 242, 220, 0.4), 0 4px 8px rgba(254, 242, 220, 0.3);
+            transform: translateY(-3px);
+            background: #FFF7E6;
+        }
+
+        .save-btn:active {
+            box-shadow: 0 3px 6px rgba(254, 242, 220, 0.3), 0 1px 3px rgba(254, 242, 220, 0.2);
+            transform: translateY(0);
+            background: #F0E2C0;
+        }
+
+        /* 提示文本样式 */
+        .hint-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #FEF2DC;
+            text-shadow: 3px 3px 6px rgba(176, 34, 27, 0.3);
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        /* 响应式设计 */
+        @media screen and (max-width: 480px) {
+            /* 调整标题大小 */
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            /* 调整预览容器大小 */
+            .preview-container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            /* 调整按钮大小 */
+            .save-btn {
+                padding: 8px 20px;
+                font-size: 12px;
+                border-radius: 20px;
+            }
+            
+            /* 调整返回按钮容器 */
+            .back-buttons-container {
+                width: 80%;
+                max-width: 300px;
+                gap: 8px;
+            }
+            
+            /* 调整返回按钮大小 */
+            .back-button {
+                min-width: calc(50% - 4px);
+                max-width: calc(50% - 4px);
+                font-size: 11px;
+            }
+
+            /* 调整提示文本大小 */
+            .hint-text {
+                font-size: 12px;
+            }
+        }
+
+        @media screen and (min-width: 481px) and (max-width: 768px) {
+            /* 调整标题大小 */
+            h1 {
+                font-size: 28px;
+                margin-bottom: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="snow-container"></div>
+    <div class="preview-container">
+        <h1>心灵卡预览</h1>
+        <div class="card-canvas-container">
+            <canvas id="fortune-card" width="460" height="826"></canvas>
+        </div>
+        <div class="button-container">
+            <button class="save-btn" onclick="saveFortuneCard()">保存心灵卡</button>
+            <div class="back-buttons-container">
+                <button class="save-btn back-button" onclick="location.href='result.html'">返回结果页</button>
+                <button class="save-btn back-button" onclick="location.href='index.html'">返回首页</button>
+            </div>
+            <p class="hint-text">分享给好友，比拼马年运势～</p>
+        </div>
+    </div>
+    <div id="petals-container"></div>
+    
+    <script>
+        // 创建雪花
+        window.onload = function() {
+            // 创建雪花
+            const snowContainer = document.getElementById('snow-container');
+            if (snowContainer) {
+                for (let i = 0; i < 50; i++) {
+                    const snowflake = document.createElement('div');
+                    snowflake.style.position = 'absolute';
+                    snowflake.style.width = (Math.random() * 10 + 5) + 'px';
+                    snowflake.style.height = snowflake.style.width;
+                    snowflake.style.backgroundColor = '#ffffff';
+                    snowflake.style.borderRadius = '50%';
+                    snowflake.style.opacity = '0.9';
+                    snowflake.style.left = (Math.random() * 100) + '%';
+                    snowflake.style.top = (Math.random() * 100) + '%';
+                    snowflake.style.boxShadow = '0 0 10px #ffffff';
+                    snowflake.style.animation = 'fall ' + (Math.random() * 5 + 5) + 's linear infinite';
+                    snowflake.style.animationDelay = '0s';
+                    snowflake.style.zIndex = '10';
+                    snowContainer.appendChild(snowflake);
+                }
+            }
+            
+            // 生成心灵卡
+            generateFortuneCard();
+        };
+
+        // 生成心灵卡
+        function generateFortuneCard() {
+            // 从localStorage中获取卦象数据
+            const hexagramData = localStorage.getItem('currentHexagram');
+            if (!hexagramData) {
+                alert('无法获取心灵卡内容，请重新抽签');
+                location.href = 'result.html';
+                return;
+            }
+            
+            const randomGua = JSON.parse(hexagramData);
+            const { name, sentence, result, adviceAI } = randomGua;
+            
+            if (!sentence) {
+                alert('无法获取心灵卡内容，请重新抽签');
+                location.href = 'result.html';
+                return;
+            }
+            
+            // 心灵卡背景图片路径
+            const carouselImages = [
+                'a1.JPG',
+                'a2.JPG',
+                'a3.JPG',
+                'a4.JPG',
+                'a5.JPG',
+                'a6.JPG',
+                'a7.JPG',
+                'a8.JPG'
+            ];
+            
+            // 随机选择一张旋转木马图片作为底图
+            const randomImageIndex = Math.floor(Math.random() * carouselImages.length);
+            const backgroundImage = carouselImages[randomImageIndex];
+            
+            // 获取canvas元素
+            const canvas = document.getElementById('fortune-card');
+            const ctx = canvas.getContext('2d');
+            
+            // 重置canvas尺寸为预览大小（1280:2275比例），使用高分辨率
+            canvas.width = 460;
+            canvas.height = 826;
+            
+            // 保存原始图片信息，用于后续保存时使用
+            window.fortuneCardData = {
+                backgroundImage: backgroundImage,
+                name: name,
+                sentence: sentence,
+                result: result,
+                adviceAI: adviceAI
+            };
+            
+            // 加载背景图片
+            const img = new Image();
+            img.crossOrigin = 'Anonymous'; // 允许跨域加载
+            img.src = backgroundImage;
+            
+            img.onload = function() {
+                // 计算图片和canvas的宽高比
+                const imgWidth = img.width;
+                const imgHeight = img.height;
+                
+                // 由于画布和图片比例相同，直接按画布尺寸绘制
+                const drawWidth = canvas.width;
+                const drawHeight = canvas.height;
+                const offsetX = 0;
+                const offsetY = 0;
+                
+                // 设置图片绘制质量为最高
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                
+                // 设置文字渲染质量
+                ctx.textRendering = 'optimizeLegibility';
+                ctx.fontSmoothingEnabled = true;
+                
+                // 绘制完整的背景图片，保持比例完全在画布内显示
+                ctx.drawImage(
+                    img, 
+                    0, 0, imgWidth, imgHeight, // 完整的源图像
+                    offsetX, offsetY, drawWidth, drawHeight // 目标画布，保持比例
+                );
+                
+                // 设置文字样式
+                ctx.fillStyle = '#FEF2DC';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                
+                // 绘制卦象名称（最大字体）
+                ctx.font = 'bold 52px "STKaiti", "KaiTi", serif';
+                ctx.fillText(name, 40, 40);
+                
+                // 绘制结果（小2号字体）
+                ctx.font = '32px "STKaiti", "KaiTi", serif';
+                ctx.fillText(result, 40, 130);
+                
+                // 绘制句子（最小字体）
+                ctx.font = '24px "STKaiti", "KaiTi", serif';
+                
+                // 文字换行处理
+                const maxWidth = canvas.width - 80; // 两边各留40px边距
+                const lineHeight = 36; // 行高
+                const lines = [];
+                let currentLine = "";
+                
+                // 分割文字为多行
+                const chars = sentence.split('');
+                for (const char of chars) {
+                    const testLine = currentLine + char;
+                    const metrics = ctx.measureText(testLine);
+                    
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = char;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                lines.push(currentLine);
+                
+                // 计算文字起始位置
+                const startY = 190; // 顶部190px margin（预留名称和结果的空间）
+                
+                // 绘制文字
+                lines.forEach((line, index) => {
+                    ctx.fillText(line, 40, startY + index * lineHeight);
+                });
+                
+                // 加载并绘制二维码图片到右下角
+                const qrCodeImg = new Image();
+                qrCodeImg.crossOrigin = 'Anonymous'; // 允许跨域加载
+                qrCodeImg.src = 'qrcode.png';
+                
+                qrCodeImg.onload = function() {
+                    // 设置二维码大小和位置（右下角）
+                    const qrCodeSize = 80; // 二维码大小（调小）
+                    const qrCodeX = canvas.width - qrCodeSize - 20; // 右边距20px
+                    const qrCodeY = canvas.height - qrCodeSize - 20; // 下边距20px
+                    
+                    // 绘制文字"扫一扫，3秒获得新年运势"
+                    ctx.font = '11px "STKaiti", "KaiTi", serif';
+                    ctx.fillStyle = '#FEF2DC';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                    ctx.shadowBlur = 2;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 1;
+                    ctx.fillText('扫一扫获得新年运势', qrCodeX + qrCodeSize/2, qrCodeY - 5);
+                    
+                    // 绘制二维码
+                    ctx.drawImage(qrCodeImg, qrCodeX, qrCodeY, qrCodeSize, qrCodeSize);
+                };
+                
+                qrCodeImg.onerror = function() {
+                    console.error('无法加载二维码图片');
+                };
+            };
+            
+            img.onerror = function() {
+                alert('无法加载背景图片，请稍后重试');
+            };
+        }
+
+        // 保存心灵卡
+        function saveFortuneCard() {
+            // 创建临时canvas用于生成真实大小的图片
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // 获取保存的数据
+            const { backgroundImage, name, sentence, result } = window.fortuneCardData;
+            
+            // 加载背景图片
+            const img = new Image();
+            img.crossOrigin = 'Anonymous'; // 允许跨域加载
+            img.src = backgroundImage;
+            
+            img.onload = function() {
+                // 设置canvas为图片的真实大小
+                const imgWidth = img.width;
+                const imgHeight = img.height;
+                
+                // 设置临时canvas尺寸为图片的真实大小
+                tempCanvas.width = imgWidth;
+                tempCanvas.height = imgHeight;
+                
+                // 绘制完整的背景图片（不裁剪）
+                tempCtx.drawImage(
+                    img, 
+                    0, 0, imgWidth, imgHeight, // 完整的源图像
+                    0, 0, imgWidth, imgHeight // 目标画布真实大小
+                );
+                
+                // 设置文字绘制质量为最高
+                tempCtx.imageSmoothingEnabled = true;
+                tempCtx.imageSmoothingQuality = 'high';
+                
+                // 设置文字样式（根据真实大小调整字体大小）
+                const baseFontSize = 12;
+                const scaleFactor = imgWidth / 230; // 计算缩放因子
+                const fontSize = baseFontSize * scaleFactor;
+                const lineHeight = 18 * scaleFactor;
+                
+                tempCtx.fillStyle = '#FEF2DC';
+                tempCtx.textAlign = 'left';
+                tempCtx.textBaseline = 'top';
+                tempCtx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                tempCtx.shadowBlur = 3;
+                tempCtx.shadowOffsetX = 1;
+                tempCtx.shadowOffsetY = 1;
+                
+                // 绘制卦象名称（最大字体）
+                tempCtx.font = `bold ${fontSize * 2.17}px "STKaiti", "KaiTi", serif`;
+                tempCtx.fillText(name, 20 * scaleFactor, 20 * scaleFactor);
+                
+                // 绘制结果（小2号字体）
+                tempCtx.font = `${fontSize * 1.33}px "STKaiti", "KaiTi", serif`;
+                tempCtx.fillText(result, 20 * scaleFactor, 65 * scaleFactor);
+                
+                // 绘制句子（最小字体）
+                tempCtx.font = `${fontSize}px "STKaiti", "KaiTi", serif`;
+                
+                // 文字换行处理
+                const maxWidth = tempCanvas.width - 40 * scaleFactor; // 两边各留边距
+                const lines = [];
+                let currentLine = "";
+                
+                // 分割文字为多行
+                const chars = sentence.split('');
+                for (const char of chars) {
+                    const testLine = currentLine + char;
+                    const metrics = tempCtx.measureText(testLine);
+                    
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = char;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                lines.push(currentLine);
+                
+                // 计算文字起始位置
+                const startY = 95 * scaleFactor; // 顶部margin（预留名称和结果的空间）
+                
+                // 绘制文字
+                lines.forEach((line, index) => {
+                    tempCtx.fillText(line, 20 * scaleFactor, startY + index * lineHeight);
+                });
+                
+                // 加载并绘制二维码图片到右下角
+                const qrCodeImg = new Image();
+                qrCodeImg.crossOrigin = 'Anonymous'; // 允许跨域加载
+                qrCodeImg.src = 'qrcode.png';
+                
+                qrCodeImg.onload = function() {
+                    // 设置二维码大小和位置（右下角）
+                    const qrCodeSize = 60 * scaleFactor; // 二维码大小（调小），根据缩放因子调整
+                    const qrCodeX = tempCanvas.width - qrCodeSize - 10 * scaleFactor; // 右边距10px，根据缩放因子调整
+                    const qrCodeY = tempCanvas.height - qrCodeSize - 10 * scaleFactor; // 下边距10px，根据缩放因子调整
+                    
+                    // 绘制二维码
+                    tempCtx.drawImage(qrCodeImg, qrCodeX, qrCodeY, qrCodeSize, qrCodeSize);
+                    
+                    // 将临时canvas转换为图片
+                    tempCanvas.toBlob(function(blob) {
+                        // 创建下载链接
+                        const link = document.createElement('a');
+                        link.download = '马年心灵卡.png';
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        
+                        // 提示用户保存并转发
+                        alert('心灵卡已保存，请分享给好友，传递马年好运！');
+                    });
+                };
+                
+                qrCodeImg.onerror = function() {
+                    console.error('无法加载二维码图片');
+                    // 即使二维码加载失败，也保存图片
+                    tempCanvas.toBlob(function(blob) {
+                        // 创建下载链接
+                        const link = document.createElement('a');
+                        link.download = '马年心灵卡.png';
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        
+                        // 提示用户保存并转发
+                        alert('心灵卡已保存（二维码加载失败），请分享给好友，传递马年好运！');
+                    });
+                };
+            };
+            
+            img.onerror = function() {
+                alert('无法加载背景图片，请稍后重试');
+            };
+        }
+    </script>
+</body>
+</html>
