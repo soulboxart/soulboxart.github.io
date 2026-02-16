@@ -544,6 +544,17 @@
                     const qrCodeX = tempCanvas.width - qrCodeSize - 10 * scaleFactor; // 右边距10px，根据缩放因子调整
                     const qrCodeY = tempCanvas.height - qrCodeSize - 10 * scaleFactor; // 下边距10px，根据缩放因子调整
                     
+                    // 绘制文字"扫一扫获得新年运势"
+                    tempCtx.font = `${fontSize * 0.46}px "STKaiti", "KaiTi", serif`;
+                    tempCtx.fillStyle = '#FEF2DC';
+                    tempCtx.textAlign = 'center';
+                    tempCtx.textBaseline = 'bottom';
+                    tempCtx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+                    tempCtx.shadowBlur = 2;
+                    tempCtx.shadowOffsetX = 1;
+                    tempCtx.shadowOffsetY = 1;
+                    tempCtx.fillText('扫一扫获得新年运势', qrCodeX + qrCodeSize/2, qrCodeY - 5 * scaleFactor);
+                    
                     // 绘制二维码
                     tempCtx.drawImage(qrCodeImg, qrCodeX, qrCodeY, qrCodeSize, qrCodeSize);
                     
