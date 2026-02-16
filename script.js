@@ -472,15 +472,31 @@ drawBtn.addEventListener('click', () => {
         modalContent.style.width = '80%';
         modalContent.style.maxWidth = '500px';
         
+        // 确保randomGua对象存在且有name和result属性
+        if (randomGua && randomGua.name && randomGua.result) {
+            // 添加卦象名称和结果
+            const nameResultElement = document.createElement('p');
+            nameResultElement.textContent = randomGua.name + ' ' + randomGua.result;
+            nameResultElement.style.fontSize = '24px';
+            nameResultElement.style.fontWeight = 'bold';
+            nameResultElement.style.lineHeight = '1.5';
+            nameResultElement.style.marginBottom = '20px';
+            nameResultElement.style.color = '#AC122A';
+            nameResultElement.style.display = 'block';
+            modalContent.appendChild(nameResultElement);
+        }
+        
         const sentenceElement = document.createElement('p');
         sentenceElement.textContent = randomGua.sentence;
-        sentenceElement.style.fontSize = '18px';
+        sentenceElement.style.fontSize = '20px';
+        sentenceElement.style.fontFamily = 'STKaiti, KaiTi, serif';
+        sentenceElement.style.fontWeight = 'normal';
         sentenceElement.style.lineHeight = '1.5';
         sentenceElement.style.marginBottom = '30px';
         sentenceElement.style.color = '#AC122A';
         
         const forwardBtn = document.createElement('button');
-        forwardBtn.textContent = '转发查看详细解读';
+        forwardBtn.textContent = '查看详细解读';
         forwardBtn.style.padding = '10px 30px';
         forwardBtn.style.fontSize = '16px';
         forwardBtn.style.backgroundColor = '#D03C2E';
