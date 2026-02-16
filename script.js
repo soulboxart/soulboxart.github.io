@@ -486,14 +486,39 @@ drawBtn.addEventListener('click', () => {
             modalContent.appendChild(nameResultElement);
         }
         
-        const sentenceElement = document.createElement('p');
-        sentenceElement.textContent = randomGua.sentence;
-        sentenceElement.style.fontSize = '20px';
-        sentenceElement.style.fontFamily = 'STKaiti, KaiTi, serif';
-        sentenceElement.style.fontWeight = 'normal';
-        sentenceElement.style.lineHeight = '1.5';
-        sentenceElement.style.marginBottom = '30px';
-        sentenceElement.style.color = '#AC122A';
+        // 按照"——"切分sentence
+        const sentenceParts = randomGua.sentence.split('——');
+        
+        // 创建句子内容元素
+        const contentElement = document.createElement('p');
+        contentElement.textContent = sentenceParts[0];
+        contentElement.style.fontSize = '20px';
+        contentElement.style.fontFamily = 'STKaiti, KaiTi, serif';
+        contentElement.style.fontWeight = 'normal';
+        contentElement.style.lineHeight = '1.5';
+        contentElement.style.textAlign = 'justify';
+        contentElement.style.color = '#AC122A';
+        contentElement.style.marginBottom = '10px';
+        modalContent.appendChild(contentElement);
+        
+        // 创建出处元素
+        if (sentenceParts.length > 1) {
+            const sourceElement = document.createElement('p');
+            sourceElement.textContent = '——' + sentenceParts[1];
+            sourceElement.style.fontSize = '18px';
+            sourceElement.style.fontFamily = 'STKaiti, KaiTi, serif';
+            sourceElement.style.fontWeight = 'normal';
+            sourceElement.style.lineHeight = '1.5';
+            sourceElement.style.textAlign = 'right';
+            sourceElement.style.color = '#AC122A';
+            sourceElement.style.marginBottom = '30px';
+            modalContent.appendChild(sourceElement);
+        } else {
+            // 如果没有出处，添加一个空的底部边距
+            const spaceElement = document.createElement('div');
+            spaceElement.style.height = '30px';
+            modalContent.appendChild(spaceElement);
+        }
         
         const forwardBtn = document.createElement('button');
         forwardBtn.textContent = '查看详细解读';
@@ -508,11 +533,14 @@ drawBtn.addEventListener('click', () => {
         forwardBtn.addEventListener('click', () => {
             // 使用localStorage存储卦象数据，减少URL参数大小
             localStorage.setItem('currentHexagram', JSON.stringify(randomGua));
-            // 跳转到结果页面，只传递必要的参数
-            window.location.href = 'result.html';
+            // 跳转到结果页面，使用动画效果
+            if (typeof navigateTo === 'function') {
+                navigateTo('result.html');
+            } else {
+                window.location.href = 'result.html';
+            }
         });
         
-        modalContent.appendChild(sentenceElement);
         modalContent.appendChild(forwardBtn);
         modal.appendChild(modalContent);
         document.body.appendChild(modal);
