@@ -2,21 +2,24 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抽取你的新年第一签</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>抽取你的新年心灵盲盒</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- 抽签页面 -->
     <div id="draw-page" class="page">
         <div id="snow-container" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 100;"></div>
-        <h1>抽取你的新年第一签</h1>
+        <h1>AI测运势，新年第一签</h1>
         <div class="carousel-container">
             <div id="carousel" class="carousel">
                 <!-- 旋转木马内容将由JS生成 -->
             </div>
         </div>
-        <button id="draw-btn" class="draw-btn">开始抽签</button>
+        <p style="color: #FEF2DC; text-shadow: 1px 1px 2px rgba(176, 34, 27, 0.3); font-size: 16px; margin: 20px 0; text-align: center; font-family: 'STKaiti', 'KaiTi', serif;">用心祈福，抽出专属你的新年签</p>
+        <div style="width: 100%; display: flex; justify-content: center; margin-top: 10px;">
+            <button id="draw-btn" class="draw-btn">开始抽签</button>
+        </div>
     </div>
 
     <style>
@@ -35,7 +38,7 @@
 
     <script>
     // 为index页面创建雪花
-    window.onload = function() {
+    function initSnow() {
         // 创建雪花
         const snowContainer = document.getElementById('snow-container');
         if (snowContainer) {
@@ -57,7 +60,7 @@
                 snowContainer.appendChild(snowflake);
             }
         }
-    };
+    }
     </script>
     
 
@@ -73,6 +76,94 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // 访问统计功能
+        function trackVisit() {
+            // 生成设备ID（基于用户代理和屏幕信息）
+            function generateDeviceId() {
+                const userAgent = navigator.userAgent;
+                const screenInfo = `${screen.width}x${screen.height}-${screen.colorDepth}`;
+                const platform = navigator.platform;
+                // 简单的哈希函数
+                let hash = 0;
+                const str = userAgent + screenInfo + platform;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // 转换为32位整数
+                }
+                return Math.abs(hash).toString(16);
+            }
+            
+            // 获取设备类型
+            function getDeviceType() {
+                const userAgent = navigator.userAgent;
+                if (/mobile/i.test(userAgent)) {
+                    return 'Mobile';
+                } else if (/tablet/i.test(userAgent)) {
+                    return 'Tablet';
+                } else {
+                    return 'Desktop';
+                }
+            }
+            
+            // 获取或创建访问数据
+            const visitData = JSON.parse(localStorage.getItem('visitData')) || {
+                totalVisits: 0,
+                uniqueDevices: {},
+                todayVisits: 0,
+                lastReset: new Date().toDateString()
+            };
+            
+            // 检查是否需要重置今日访问次数
+            const today = new Date().toDateString();
+            if (visitData.lastReset !== today) {
+                visitData.todayVisits = 0;
+                visitData.lastReset = today;
+            }
+            
+            // 生成设备ID
+            const deviceId = generateDeviceId();
+            const deviceType = getDeviceType();
+            
+            // 更新访问数据
+            visitData.totalVisits++;
+            visitData.todayVisits++;
+            
+            // 更新设备信息
+            if (!visitData.uniqueDevices[deviceId]) {
+                visitData.uniqueDevices[deviceId] = {
+                    deviceType: deviceType,
+                    userAgent: navigator.userAgent,
+                    firstVisit: new Date().toISOString(),
+                    visitCount: 0
+                };
+            }
+            visitData.uniqueDevices[deviceId].visitCount++;
+            visitData.uniqueDevices[deviceId].lastVisit = new Date().toISOString();
+            
+            // 保存数据到localStorage
+            localStorage.setItem('visitData', JSON.stringify(visitData));
+        }
+        
+        // 页面加载时执行访问统计
+        window.onload = function() {
+            // 先执行原有的雪花效果
+            if (typeof initSnow === 'function') {
+                initSnow();
+            }
+            // 执行旋转木马初始化
+            if (typeof initCarousel === 'function') {
+                initCarousel();
+            }
+            // 执行雪花效果（如果存在）
+            if (typeof createSnowflakes === 'function') {
+                createSnowflakes();
+            }
+            // 执行访问统计
+            trackVisit();
+        };
+    </script>
     <div class="footer">本应用仅供娱乐</div>
 </body>
 </html>
