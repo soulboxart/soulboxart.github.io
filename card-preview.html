@@ -537,13 +537,13 @@
                     tempCanvas.toBlob(function(blob) {
                         // 创建下载链接
                         const link = document.createElement('a');
-                        link.download = '马年心灵卡.png';
+                        link.download = '马年心灵卡.jpg';
                         link.href = URL.createObjectURL(blob);
                         link.click();
                         
                         // 提示用户保存并转发
                         alert('心灵卡已保存，请分享给好友，传递马年好运！');
-                    });
+                    }, 'image/jpeg', 0.9);
                 };
                 
                 qrCodeImg.onerror = function() {
@@ -552,13 +552,13 @@
                     tempCanvas.toBlob(function(blob) {
                         // 创建下载链接
                         const link = document.createElement('a');
-                        link.download = '马年心灵卡.png';
+                        link.download = '马年心灵卡.jpg';
                         link.href = URL.createObjectURL(blob);
                         link.click();
                         
                         // 提示用户保存并转发
                         alert('心灵卡已保存（二维码加载失败），请分享给好友，传递马年好运！');
-                    });
+                    }, 'image/jpeg', 0.9);
                 };
             };
             
