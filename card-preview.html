@@ -283,8 +283,7 @@
             // 从localStorage中获取卦象数据
             const hexagramData = localStorage.getItem('currentHexagram');
             if (!hexagramData) {
-                alert('无法获取心灵卡内容，请重新抽签');
-                navigateTo('result.html');
+                navigateTo('index.html');
                 return;
             }
             
@@ -292,8 +291,7 @@
             const { name, sentence, result, adviceAI } = randomGua;
             
             if (!sentence) {
-                alert('无法获取心灵卡内容，请重新抽签');
-                navigateTo('result.html');
+                navigateTo('index.html');
                 return;
             }
             
