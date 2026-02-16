@@ -572,13 +572,39 @@
             };
         }
         
-        // 保存图片函数（优化移动端兼容性）
+        // 保存图片函数（优化移动端兼容性，特别是微信浏览器）
         function saveImage(canvas, filename) {
+            // 检测是否为微信浏览器
+            const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
             // 检测是否为移动设备
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            if (isMobile) {
-                // 移动端处理
+            if (isWeChat) {
+                // 微信浏览器处理
+                try {
+                    // 生成图片数据
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+                    
+                    // 显示提示，引导用户在浏览器中打开
+                    alert('微信浏览器限制下载功能，请点击右上角「···」选择「在浏览器中打开」，然后再点击保存按钮。');
+                    
+                    // 同时尝试直接保存（部分微信版本可能支持）
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = dataURL;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    
+                    setTimeout(() => {
+                        link.click();
+                        document.body.removeChild(link);
+                    }, 100);
+                } catch (error) {
+                    console.error('保存失败:', error);
+                    alert('微信浏览器限制下载功能，请在浏览器中打开后再试。');
+                }
+            } else if (isMobile) {
+                // 其他移动端浏览器处理
                 try {
                     // 尝试使用toDataURL方法
                     const dataURL = canvas.toDataURL('image/jpeg', 0.9);
